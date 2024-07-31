@@ -1,0 +1,9 @@
+.env/
+*.pyc
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*$py.class
+.vscode/
+__pycache__/
+.venv
+.idea

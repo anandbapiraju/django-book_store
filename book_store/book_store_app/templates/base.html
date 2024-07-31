@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Book Store{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #495057;
+        }
+        nav .nav-left, nav .nav-right {
+            display: flex;
+            align-items: center;
+        }
+        nav .nav-left h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        nav ul li {
+            margin: 0 10px;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        nav ul li a i {
+            margin-right: 8px;
+        }
+        nav .search-bar {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            margin: 0 20px;
+            max-width: 50%;
+        }
+        nav .search-bar input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            flex-grow: 1;
+            font-size: 1rem;
+        }
+        nav .search-bar button {
+            padding: 10px;
+            border: none;
+            background-color: #6c757d;
+            color: #fff;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        nav .search-bar button:hover {
+            background-color: #868e96;
+        }
+        nav .user-actions {
+            display: flex;
+            align-items: center;
+        }
+        nav .user-actions a {
+            margin-left: 10px;
+            color: #fff;
+            text-decoration: none;
+        }
+        main {
+            padding: 20px;
+        }
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            padding: 5px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        footer .social-media a {
+            margin: 0 10px;
+            display: inline-block;
+        }
+        footer .social-media i {
+            font-size: 20px;
+            color: #fff;
+        }
+        .book-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: space-around;
+        }
+
+        .book-item {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 200px;
+            text-align: center;
+        }
+
+        .book-img-wrapper {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .book-img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .book-item h3 a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .book-item h3 a:hover {
+            text-decoration: underline;
+        }
+
+        .book-item p {
+            margin: 10px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <h1>Book Store</h1>
+        </div>
+        <ul>
+            <li><a href="{% url 'book_store_app:home' %}"><i class="fas fa-home"></i>Home</a></li>
+            <li><a href="{% url 'book_store_app:cart' %}"><i class="fas fa-shopping-cart"></i>Cart</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'book_store_app:my_profile' %}"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="{% url 'book_store_app:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'book_store_app:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            {% endif %}
+        </ul>
+        <div class="search-bar">
+            <input type="text" placeholder="Search books...">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </div>
+    </nav>
+    <main>
+        {% block content %}
+        <!-- Default content goes here -->
+        {% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Book Store. All rights reserved.</p>
+        <p>Contact us at <a href="mailto:info@bookstore.com">info@bookstore.com</a></p>
+        <div class="social-media">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </footer>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} Details{% endblock %}
+
+{% block content %}
+<div class="book-details">
+    <img src="{{ book.book_img.url }}" alt="{{ book.title }}" class="book-img">
+    <h2>{{ book.title }}</h2>
+    <p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>Price:</strong> ${{ book.price }}</p>
+    <p><strong>Description:</strong> {{ book.description }}</p>
+    <form action="{% url 'book_store_app:add_to_cart' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="book_id" value="{{ book.id }}">
+        <div class="quantity-container">
+            <button type="button" class="quantity-btn" onclick="decreaseQuantity({{ book.id }})">-</button>
+            <input type="number" name="quantity" id="quantity-{{ book.id }}" class="quantity-input" value="1" min="1">
+            <button type="button" class="quantity-btn" onclick="increaseQuantity({{ book.id }})">+</button>
+        </div>
+        <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+    </form>
+</div>
+{% endblock %}

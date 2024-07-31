@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+    {% for message in messages %}
+    <p><strong>{{ message }}</strong></p>
+    {% endfor %}
+    {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+    {% crispy form %}
+    <p>Not a user?</p>
+    <b><a href="{% url 'book_store_app:register' %}">Register Here!</a></b>
+{% endblock %}

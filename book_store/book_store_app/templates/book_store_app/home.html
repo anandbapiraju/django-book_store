@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="book-container">
+    {% for book in books %}
+    <div class="book-item">
+        <div class="book-img-wrapper">
+            <img src="{{ book.book_img.url }}" alt="{{ book.title }}" class="book-img">
+        </div>
+        <h3><a href="{% url 'book_store_app:book_details' book.id %}">{{ book.book_title }}</a></h3>
+        <p><strong>Price:</strong> ₹{{ book.price }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function decreaseQuantity(bookId) {
+        const quantityInput = document.getElementById(`quantity-${bookId}`);
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    }
+
+    function increaseQuantity(bookId) {
+        const quantityInput = document.getElementById(`quantity-${bookId}`);
+        let currentValue = parseInt(quantityInput.value);
+        quantityInput.value = currentValue + 1;
+    }
+</script>
+{% endblock %}
