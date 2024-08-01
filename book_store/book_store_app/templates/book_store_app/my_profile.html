@@ -3,8 +3,9 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-{% load crispy_forms_tags %}
-
-{% crispy form %}
-
+<div class="container">
+    <h2>Update Profile</h2>
+    {% load crispy_forms_tags %}
+    {% crispy form %}
+</div>
 {% endblock %}

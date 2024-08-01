@@ -5,17 +5,64 @@
 {% block content %}
 <h2>My Cart</h2>
 {% if cart_items %}
-    <ul>
+    <ul class="cart-items">
         {% for item in cart_items %}
-        <li>
-            <img src="{{ item.book.book_img.url }}" alt="{{ item.book.title }}" style="width: 100px; height: auto;">
-            <h3>{{ item.book.book_title }}</h3>
-            <p>Quantity: {{ item.quantity }}</p>
-            <p>Price: ${{ item.book.price }}</p>
+        <li class="cart-item">
+            <img src="{{ item.book.book_img.url }}" alt="{{ item.book.title }}" class="cart-item-img">
+            <div class="cart-item-details">
+                <h3>{{ item.book.book_title }}</h3>
+                <form action="{% url 'book_store_app:update_cart' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ item.book.id }}">
+                    <div class="quantity-container">
+                        <button type="button" class="quantity-btn" onclick="decreaseQuantity({{ item.book.id }})">-</button>
+                        <input type="number" name="quantity" id="quantity-{{ item.book.id }}" class="quantity-input" value={{item.quantity}} min="1">
+                        <button type="button" class="quantity-btn" onclick="increaseQuantity({{ item.book.id }})">+</button>
+                    </div>
+                    <button type="submit">Save</button>
+                </form>
+                <p>Price: ${{ item.book.price }}</p>
+                {% if item.message and item.user == user %}
+                <p><strong>{{message}}</strong></p>
+                {% endif %}
+                <form method="post" action="{% url 'book_store_app:delete_item' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-button">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
         </li>
         {% endfor %}
     </ul>
+    <div class="total-bill">
+        <form action="{% url 'book_store_app:shopping' %}" method="post">
+            {% csrf_token %}
+            <p>total bill : {{total_bill}}</p>
+            <input type="hidden" name="total_bill" value="{{ total_bill }}">
+            <button type="submit">Proceed</button>
+        </form>
+    </div>
 {% else %}
     <p>Your cart is empty.</p>
 {% endif %}
+
+{% block extra_js %}
+<script>
+    function decreaseQuantity(bookId) {
+        const quantityInput = document.getElementById(`quantity-${bookId}`);
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    }
+
+    function increaseQuantity(bookId) {
+        const quantityInput = document.getElementById(`quantity-${bookId}`);
+        let currentValue = parseInt(quantityInput.value);
+        quantityInput.value = currentValue + 1;
+    }
+</script>
+{% endblock %}
+
 {% endblock %}

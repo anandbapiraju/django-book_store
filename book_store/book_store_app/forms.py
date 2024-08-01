@@ -79,7 +79,7 @@ class ProfileForm(forms.ModelForm):
                 css_class='form-group'
             )
         )
-        self.helper.form_action = "/my_profile/"
+        self.helper.form_action = "/home/my_profile/"
 
         if self.instance and hasattr(self.instance, 'user'):
             self.fields['first_name'].initial = self.instance.user.first_name

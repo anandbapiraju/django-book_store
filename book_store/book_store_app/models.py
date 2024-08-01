@@ -37,7 +37,7 @@ class Book(models.Model):
 
 class BookSpecifications(models.Model):
     objects = models.Manager()
-    book_id = models.ForeignKey(Book,on_delete=models.CASCADE)
+    book = models.ForeignKey(Book,on_delete=models.CASCADE)
     book_code = models.CharField(max_length=256)
     publisher = models.CharField(max_length=256)
     publish_date = models.DateField(null=True)
@@ -53,5 +53,31 @@ class Cart(models.Model):
 
 
     def __str__(self):
-        return f"{self.user.name}'s cart: {self.book.name} (Quantity: {self.quantity})"
+        return f"{self.user}'s cart: {self.book} (Quantity: {self.quantity})"
+
+
+
+class Orders(models.Model):
+    objects = models.Manager()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    total_price = models.FloatField(default=0.0)
+    address = models.CharField(max_length=256,null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    pincode = models.IntegerField(default=0)
+    time = models.DateTimeField(auto_now_add=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.id = None
+
+    def __str__(self):
+        return f"Order {self.id} by {self.user} at {self.time}"
+
+
+class OrderItems(models.Model):
+    objects = models.Manager()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_items')
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='items')
+    book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='order_items')
+    quantity = models.IntegerField(default=1)
 

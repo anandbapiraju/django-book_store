@@ -11,7 +11,7 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(BookSpecifications)
 class SpecificationAdmin(admin.ModelAdmin):
-    list_display = ('book_code','publisher','publish_date','pages','description')
+    list_display = ('book_id','book_code','publisher','publish_date','pages','description')
 
 
 @admin.register(Profile)
