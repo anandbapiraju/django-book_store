@@ -1,27 +1,30 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Search Results{% endblock %}
 
 {% block content %}
-<h2>Search Results</h2>
-
-{% if books %}
-    <div class="book-container">
-        {% for book in books %}
-        <div class="book-item">
-            <div class="book-img-wrapper">
-                <img src="{{ book.book_img.url }}" alt="{{ book.book_title }}" class="book-img">
+<div class="container mt-5">
+    <h2 class="mb-4">Search Results</h2>
+    {% if books %}
+        <div class="row">
+            {% for book in books %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="book-img-wrapper">
+                        <img src="{{ book.book_img.url }}" alt="{{ book.book_title }}" class="book-img img-fluid">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title"><a href="{% url 'book_store_app:book_details' book.id %}">{{ book.book_title }}</a></h3>
+                        <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
+                        <p class="card-text"><strong>Price:</strong> ₹{{ book.price }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="book-details">
-                <h3><a href="{% url 'book_store_app:book_details' book.id %}">{{ book.book_title }}</a></h3>
-                <p>Author: {{ book.author }}</p>
-                <p>Price: ${{ book.price }}</p>
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <p>No books found for "{{ search_text }}".</p>
-{% endif %}
-
+    {% else %}
+        <p class="alert alert-warning">No books found for "{{ search_text }}".</p>
+    {% endif %}
+</div>
 {% endblock %}

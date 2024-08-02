@@ -3,373 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Book Store{% endblock %}</title>
+    <title>{% block title %}Bookstore{% endblock %}</title>
     {% load static %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #495057;
-        }
-        nav .nav-left, nav .nav-right {
-            display: flex;
-            align-items: center;
-        }
-        nav .nav-left h1 {
-            margin: 0;
-            color: #fff;
-            font-size: 1.5rem;
-        }
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            align-items: center;
-        }
-        nav ul li {
-            margin: 0 10px;
-        }
-        nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-        nav ul li a:hover {
-            text-decoration: underline;
-        }
-        nav ul li a i {
-            margin-right: 8px;
-        }
-        nav .search-bar {
-            display: flex;
-            flex-grow: 1;
-            justify-content: center;
-            margin: 0 20px;
-            max-width: 50%;
-        }
-        nav .search-bar input[type="text"] {
-            padding: 10px;
-            border: none;
-            border-radius: 5px 0 0 5px;
-            flex-grow: 1;
-            font-size: 1rem;
-        }
-        nav .search-bar button {
-            padding: 10px;
-            border: none;
-            background-color: #6c757d;
-            color: #fff;
-            border-radius: 0 5px 5px 0;
-            cursor: pointer;
-        }
-        nav .search-bar button:hover {
-            background-color: #868e96;
-        }
-        nav .user-actions {
-            display: flex;
-            align-items: center;
-        }
-        nav .user-actions a {
-            margin-left: 10px;
-            color: #fff;
-            text-decoration: none;
-        }
-        main {
-            padding: 20px;
-        }
-        footer {
-            background-color: #343a40;
-            color: #fff;
-            text-align: center;
-            padding: 5px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-        footer .social-media a {
-            margin: 0 10px;
-            display: inline-block;
-        }
-        footer .social-media i {
-            font-size: 20px;
-            color: #fff;
-        }
-        .book-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-around;
-        }
-        .book-item {
-            background-color: #fff;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 200px;
-            text-align: center;
-        }
-        .book-img-wrapper {
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-        .book-img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-        .book-item h3 a {
-            color: #333;
-            text-decoration: none;
-        }
-        .book-item h3 a:hover {
-            text-decoration: underline;
-        }
-        .book-item p {
-            margin: 10px 0;
-        }
-        .cart-items {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .cart-item {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px;
-            width: calc(33.333% - 20px);
-            box-sizing: border-box;
-        }
-        .cart-item-img {
-            width: 100px;
-            height: auto;
-            margin-right: 20px;
-        }
-        .cart-item-details {
-            display: flex;
-            flex-direction: column;
-        }
-        .cart-item-details h3,
-        .cart-item-details p {
-            margin: 0;
-            margin-bottom: 10px;
-        }
-        .delete-button {
-            background: none;
-            border: none;
-            color: #f00;
-            cursor: pointer;
-        }
-        .delete-button i {
-            font-size: 1.5em;
-        }
-        .book-details-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            padding: 20px;
-        }
-        .book-details {
-            flex: 2;
-            max-width: calc(100% - 340px); /* Adjust based on .book-specs width */
-        }
-        .book-specs {
-            flex: 1;
-            max-width: 300px; /* Adjust as needed */
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .book-specs table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .book-specs th,
-        .book-specs td {
-            padding: 8px;
-            text-align: left;
-        }
-        .book-specs th {
-            background-color: #f4f4f4;
-        }
-        .book-specs tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .profile-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        .profile-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .profile-header h2 {
-            margin: 0;
-            font-size: 2rem;
-        }
-        .profile-header p {
-            margin: 5px 0;
-            color: #555;
-        }
-        .profile-form {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .profile-form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .profile-form input[type="text"],
-        .profile-form input[type="email"],
-        .profile-form input[type="password"],
-        .profile-form textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        .profile-form textarea {
-            height: 100px;
-            resize: vertical;
-        }
-        .profile-form button {
-            background-color: #495057;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .profile-form button:hover {
-            background-color: #343a40;
-        }
-        .shopping-container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .shopping-container h2 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .form-group {
-        margin-bottom: 15px;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-    .form-group input[type="text"],
-    .form-group textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 1rem;
-    }
-    .form-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
-    .proceed-button,
-    .cancel-button {
-        padding: 10px 20px;
-        font-size: 1rem;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-decoration: none;
-        color: #fff;
-    }
-    .proceed-button {
-        background-color: #28a745;
-    }
-    .proceed-button:hover {
-        background-color: #218838;
-    }
-    .cancel-button {
-        background-color: #dc3545;
-    }
-    .cancel-button:hover {
-        background-color: #c82333;
-    }
-    </style>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'styles/main.css' %}">
+    <!-- Optional: Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.4.1/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <nav>
-        <div class="nav-left">
-            <h1>Book Store</h1>
-        </div>
-        <ul>
-            <li><a href="{% url 'book_store_app:home' %}"><i class="fas fa-home"></i>Home</a></li>
-            {% if user.is_authenticated %}
-            <li><a href="{% url 'book_store_app:cart' user.id %}"><i class="fas fa-shopping-cart"></i>Cart</a></li>
-            <li><a href="{% url 'book_store_app:my_profile' %}"><i class="fas fa-user"></i> Profile</a></li>
-            <li><a href="{% url 'book_store_app:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            {% else %}
-            <li><a href="{% url 'book_store_app:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-            {% endif %}
-        </ul>
-        <div class="search-bar">
-            <form action="{% url 'book_store_app:search'%}" method="post">
-                {% csrf_token %}
-                <input name='text' type="text" placeholder="Search books..." value="{{search_text}}">
-                <button type="submit"><i class="fas fa-search"></i></button>
-            </form>
-        </div>
-    </nav>
-    <main>
-        {% block content %}
-        <!-- Default content goes here -->
-        {% endblock %}
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" href="#">Book Store</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_store_app:home' %}"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_store_app:cart' user.id %}"><i class="bi bi-cart"></i> Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_store_app:orders' user.id %}"><i class="bi bi-box"></i> Orders</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <form class="form-inline my-2 my-lg-0 mx-auto" method="post" action="{% url 'book_store_app:search' %}">
+                    {% csrf_token %}
+                    <input class="form-control mr-sm-2" type="search" name="text" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+                </form>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i> Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_store_app:logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
     </main>
-    <footer>
-        <p>&copy; 2024 Book Store. All rights reserved.</p>
-        <p>Contact us at <a href="mailto:info@bookstore.com">info@bookstore.com</a></p>
-        <div class="social-media">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                <i class="fab fa-facebook"></i>
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                <i class="fab fa-twitter"></i>
-            </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                <i class="fab fa-instagram"></i>
-            </a>
-        </div>
+
+    <footer class="bg-dark text-white text-center py-3 fixed-bottom">
+        <p class="mb-0">© 2024 Book Store. All rights reserved.</p>
     </footer>
+
     {% block extra_js %}{% endblock %}
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

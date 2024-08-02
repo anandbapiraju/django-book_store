@@ -3,14 +3,22 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-{% load crispy_forms_tags %}
-    {% for message in messages %}
-    <p><strong>{{ message }}</strong></p>
-    {% endfor %}
-    {% if message %}
-    <p>{{ message }}</p>
-    {% endif %}
-    {% crispy form %}
-    <p>Not a user?</p>
-    <b><a href="{% url 'book_store_app:register' %}">Register Here!</a></b>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center">Login</h2>
+                    {% load crispy_forms_tags %}
+                    {% for message in messages %}
+                    <p class="text-danger">{{ message }}</p>
+                    {% endfor %}
+                    {% crispy form %}
+                    <p class="text-center mt-3">Not a user?</p>
+                    <a href="{% url 'book_store_app:register' %}" class="btn btn-primary btn-block">Register Here!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

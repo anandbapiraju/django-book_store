@@ -159,7 +159,7 @@ def book_details_view(request, book_id):
 def delete_item_view(request, item_id):
     cart = get_object_or_404(Cart, id=item_id, user=request.user)
     cart.delete()
-    return redirect('book_store_app:cart')
+    return redirect('book_store_app:cart',user_id=request.user.id)
 
 
 @login_required(login_url='book_store_app:login')
@@ -186,50 +186,69 @@ def search_view(request):
 def shopping_view(request):
     profile = Profile.objects.get(user=request.user)
     context = {'profile': profile}
-    if request.method == 'post':
+    if request.method == 'POST':
         total_bill = request.POST.get('total_bill')
+        print("Received total_bill:", total_bill)
         context['total_bill'] = total_bill
 
     return render(request, 'book_store_app/shopping.html', context)
 
 
 @login_required(login_url='book_store_app:login')
-def orders_view(request):
+def order_page_view(request):
     context = {}
 
     if request.method == 'POST':
-        total_bill = float(request.POST.get('total_bill', 0))
-        phone_number = request.POST.get('phone_number')
-        address = request.POST.get('address')
-        pincode = request.POST.get('pincode')
+        total_bill = request.POST.get('total_bill', '0.0')
+        phone_number = request.POST.get('phone_number', '').strip()
+        address = request.POST.get('address', '').strip()
+        pincode = request.POST.get('pincode', '0').strip()
 
-        order = Orders.objects.create(
-            total_price=total_bill,
-            user=request.user,
-            address=address,
-            phone_number=phone_number,
-            pincode=pincode
-        )
-
-        cart_items = Cart.objects.filter(user=request.user)
-        order_items = []
-        for item in cart_items:
-            order_item = OrderItems.objects.create(
-                user=item.user,
-                order=order,
-                book_id=item.book.id,
-                quantity=item.quantity
+        if not (phone_number and address and pincode):
+            context['error'] = "All fields are required."
+        else:
+            order = Orders.objects.create(
+                user=request.user,
+                total_price=total_bill,
+                address=address,
+                phone_number=phone_number,
+                pincode=int(pincode)
             )
-            order_items.append(order_item)
 
-        cart_items.delete()
+            cart_items = Cart.objects.filter(user=request.user)
+            order_items = []
+            for item in cart_items:
+                order_item = OrderItems.objects.create(
+                    user=item.user,
+                    order=order,
+                    book=item.book,
+                    quantity=item.quantity
+                )
+                order_items.append(order_item)
 
-        context = {
-            'total_bill': total_bill,
-            'phone_number': phone_number,
-            'address': address,
-            'pincode': pincode,
-            'order_items': order_items
-        }
+            cart_items.delete()
 
-    return render(request, 'book_store_app/orders.html', context)
+            context = {
+                'total_bill': total_bill,
+                'phone_number': phone_number,
+                'address': address,
+                'pincode': pincode,
+                'order_items': order_items,
+                'success': "Order placed successfully!"
+            }
+
+    return render(request, 'book_store_app/order_page.html', context)
+
+
+class OrdersView(ListView):
+    model = OrderItems
+    template_name = "book_store_app/orders.html"
+    context_object_name = 'order_items'
+
+    def get_queryset(self):
+        return OrderItems.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+

@@ -1,18 +1,22 @@
 {% extends 'base.html' %}
-
 {% block title %}Home{% endblock %}
-
 {% block content %}
-<div class="book-container">
-    {% for book in books %}
-    <div class="book-item">
-        <div class="book-img-wrapper">
-            <img src="{{ book.book_img.url }}" alt="{{ book.title }}" class="book-img">
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Featured Books</h2>
+    <div class="row">
+        {% for book in books %}
+        <div class="col-md-4 mb-4">
+            <div class="card custom-card">
+                <img src="{{ book.book_img.url }}" class="card-img-top" alt="{{ book.book_title }}">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'book_store_app:book_details' book.id %}" class="text-dark">{{ book.book_title }}</a>
+                    </h5>
+                    <p class="card-text"><strong>Price:</strong> ₹{{ book.price }}</p>
+                </div>
+            </div>
         </div>
-        <h3><a href="{% url 'book_store_app:book_details' book.id %}">{{ book.book_title }}</a></h3>
-        <p><strong>Price:</strong> ₹{{ book.price }}</p>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
-
 {% endblock %}

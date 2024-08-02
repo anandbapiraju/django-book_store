@@ -15,6 +15,7 @@ urlpatterns=[
     path('home/update_cart/', views.update_cart_view, name='update_cart'),
     path('home/search/',views.search_view,name='search'),
     path('home/shopping/', views.shopping_view, name='shopping'),
-    path('home/orders/', views.orders_view, name='orders'),
+    path('home/order_page/', views.order_page_view, name='order_page'),
+    path('home/orders/<int:user_id>/', views.OrdersView.as_view(), name='orders'),
 
 ]

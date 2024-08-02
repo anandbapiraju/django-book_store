@@ -1,64 +1,78 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ book.title }} Details{% endblock %}
 
 {% block content %}
-<div class="book-details-container">
-    <div class="book-details">
-        <img src="{{ book.book_img.url }}" alt="{{ book.title }}" class="book-img">
-        <h2>{{ book.title }}</h2>
-        <p><strong>Author:</strong> {{ book.author }}</p>
-        <p><strong>Price:</strong>  ₹{{ book.price }}</p>
-        <form action="{% url 'book_store_app:add_to_cart' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="book_id" value="{{ book.id }}">
-            <div class="quantity-container">
-                <button type="button" class="quantity-btn" onclick="decreaseQuantity({{ book.id }})">-</button>
-                <input type="number" name="quantity" id="quantity-{{ book.id }}" class="quantity-input" value="1" min="1">
-                <button type="button" class="quantity-btn" onclick="increaseQuantity({{ book.id }})">+</button>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <img src="{{ book.book_img.url }}" class="img-fluid" alt="{{ book.title }}">
+        </div>
+        <div class="col-md-6">
+            <h2>{{ book.title }}</h2>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Price:</strong> ₹{{ book.price }}</p>
+            <form action="{% url 'book_store_app:add_to_cart' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="book_id" value="{{ book.id }}">
+                <div class="form-group">
+                    <label for="quantity-{{ book.id }}">Quantity:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-outline-secondary" onclick="decreaseQuantity({{ book.id }})">-</button>
+                        </div>
+                        <input type="number" name="quantity" id="quantity-{{ book.id }}" class="form-control" value="1" min="1">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary" onclick="increaseQuantity({{ book.id }})">+</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+            </form>
+            <div class="mt-4">
+                <h3>Book Specifications</h3>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th>Book Code</th>
+                            <td>{{ book_specs.book_code }}</td>
+                        </tr>
+                        <tr>
+                            <th>Publisher</th>
+                            <td>{{ book_specs.publisher }}</td>
+                        </tr>
+                        <tr>
+                            <th>Publish Date</th>
+                            <td>{{ book_specs.publish_date }}</td>
+                        </tr>
+                        <tr>
+                            <th>Pages</th>
+                            <td>{{ book_specs.pages }}</td>
+                        </tr>
+                        <tr>
+                            <th>Description</th>
+                            <td>{{ book_specs.description }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <button type="submit">Add to Cart</button>
-        </form>
+        </div>
     </div>
-    <div class="book-specs">
-        <h3>Book Specifications</h3>
-        <table>
-            <tr>
-                <th>Book Code</th>
-                <td>{{ book_specs.book_code }}</td>
-            </tr>
-            <tr>
-                <th>Publisher</th>
-                <td>{{ book_specs.publisher }}</td>
-            </tr>
-            <tr>
-                <th>Publish Date</th>
-                <td>{{ book_specs.publish_date }}</td>
-            </tr>
-            <tr>
-                <th>Pages</th>
-                <td>{{ book_specs.pages }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ book_specs.description }}</td>
-            </tr>
-        </table>
-    </div>
-</div>
-<script>
-    function decreaseQuantity(bookId) {
-        const quantityInput = document.getElementById(`quantity-${bookId}`);
-        let currentValue = parseInt(quantityInput.value);
-        if (currentValue > 1) {
-            quantityInput.value = currentValue - 1;
+    <script>
+        function decreaseQuantity(bookId) {
+            const quantityInput = document.getElementById(`quantity-${bookId}`);
+            let currentValue = parseInt(quantityInput.value);
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
         }
-    }
 
-    function increaseQuantity(bookId) {
-        const quantityInput = document.getElementById(`quantity-${bookId}`);
-        let currentValue = parseInt(quantityInput.value);
-        quantityInput.value = currentValue + 1;
-    }
-</script>
+        function increaseQuantity(bookId) {
+            const quantityInput = document.getElementById(`quantity-${bookId}`);
+            let currentValue = parseInt(quantityInput.value);
+            quantityInput.value = currentValue + 1;
+        }
+    </script>
+</div>
 {% endblock %}

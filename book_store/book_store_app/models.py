@@ -66,18 +66,16 @@ class Orders(models.Model):
     pincode = models.IntegerField(default=0)
     time = models.DateTimeField(auto_now_add=True)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(args, kwargs)
-        self.id = None
 
     def __str__(self):
-        return f"Order {self.id} by {self.user} at {self.time}"
+        return f"Order  by {self.user} at {self.time}"
+
 
 
 class OrderItems(models.Model):
     objects = models.Manager()
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_items')
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='items')
-    book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='order_items')
+    book = models.ForeignKey(Book,on_delete=models.CASCADE, related_name='order_items')
     quantity = models.IntegerField(default=1)
 

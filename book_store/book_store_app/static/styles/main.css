@@ -1,0 +1,85 @@
+body {
+    background-color: #f8f9fa;
+    padding-bottom: 70px;
+}
+
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar-brand {
+    color: #ffffff !important;
+}
+
+.nav-link {
+    color: #ffffff !important;
+}
+
+.nav-link:hover {
+    color: #f8f9fa !important;
+}
+
+.footer {
+    background-color: #343a40;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+}
+
+.footer a {
+    color: #ffffff;
+}
+
+.footer a:hover {
+    color: #f8f9fa;
+}
+
+.container {
+    margin-top: 80px;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-img-top {
+    object-fit: cover;
+    height: 300px;
+    width: 100%;
+}
+
+.book-img-wrapper {
+    height: 300px;
+    overflow: hidden;
+}
+
+.book-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.main-content {
+    padding-top: 80px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5rem;
+}
+
+.alert {
+    margin-top: 20px;
+}
