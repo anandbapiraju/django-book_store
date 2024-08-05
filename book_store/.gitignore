@@ -1,9 +1,23 @@
-.env/
+.idea/
 *.pyc
 # Byte-compiled / optimized / DLL files
+__pycache__/
 *.py[cod]
 *$py.class
+
+
+
 .vscode/
-__pycache__/
-.venv
-.idea
+/TABLES
+
+#envoiment variable
+.env
+
+#virtual
+.venv/
+
+__init__.py
+
+media/
+
+locale/

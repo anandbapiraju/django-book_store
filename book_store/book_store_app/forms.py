@@ -1,6 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, HTML, Div, Layout
+from django.urls import reverse
 
 from .models import Profile
 
@@ -22,7 +23,7 @@ class LoginForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Login'))
-        self.helper.form_action = "/login/"
+        self.helper.form_action = reverse('book_store_app:login')
 
 
 class RegisterForm(forms.Form):

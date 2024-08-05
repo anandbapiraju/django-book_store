@@ -3,10 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login
 from django.urls import reverse
+from django.utils import translation
 from django.views.generic import ListView
 from .forms import LoginForm, RegisterForm, ProfileForm
 from .models import Book, Cart, BookSpecifications, Profile, Orders, OrderItems
-from django.utils.translation import get_language
+
 
 
 
@@ -17,11 +18,6 @@ class BookListView(ListView):
     model = Book
     template_name = "book_store_app/home.html"
     context_object_name = 'books'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['get_current_language'] = get_language()
-        return context
 
 
 class CartView(ListView):
@@ -48,7 +44,9 @@ def login_view(request):
         user_name = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=user_name, password=password)
+        print(f'authenticated user: {user}')
         if user is not None:
+            print("user is not none")
             login(request, user)
             context['current_user'] = request.user
             return redirect('book_store_app:home')
@@ -260,3 +258,21 @@ class OrdersView(ListView):
         context = super().get_context_data(**kwargs)
         return context
 
+
+def set_language(request):
+    language = request.GET.get('language', 'en')
+    translation.activate(language)
+    request.session['django_language'] = language
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required(login_url='book_store_app:login')
+def staff_dashboard(request):
+    context={}
+    return render(request,'book_store_app/staff_dashboard.html',context)
+
+
+@login_required(login_url='book_store_app:login')
+def update_inventory_view(request):
+    context={}
+    return render(request,'book_store_app/updateInventory.html',context)

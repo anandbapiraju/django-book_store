@@ -13,7 +13,10 @@
                     {% for message in messages %}
                     <p class="text-danger">{{ message }}</p>
                     {% endfor %}
-                    {% crispy form %}
+                    <form method="post" action="{% url 'book_store_app:login' %}">
+                        {% csrf_token %}
+                        {% crispy form %}
+                    </form>
                     <p class="text-center mt-3">Not a user?</p>
                     <a href="{% url 'book_store_app:register' %}" class="btn btn-primary btn-block">Register Here!</a>
                 </div>

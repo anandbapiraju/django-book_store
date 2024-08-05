@@ -24,7 +24,11 @@
             {% endfor %}
         </div>
     {% else %}
+        {% if search_text %}
         <p class="alert alert-warning">No books found for "{{ search_text }}".</p>
+        {% else %}
+        <p class="alert alert-warning">Nothing entered!</p>
+        {% endif %}
     {% endif %}
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="{{ get_current_language }}">
 {% load i18n %}
 <head>
     <meta charset="UTF-8">
@@ -35,7 +35,7 @@
                 </ul>
                 <form class="form-inline my-2 my-lg-0" method="post" action="{% url 'book_store_app:search' %}">
                     {% csrf_token %}
-                    <input class="form-control mr-sm-2" type="search" name="text" placeholder="Search" aria-label="Search">
+                    <input class="form-control mr-sm-2" type="search" name="text" placeholder="{% trans 'Search' %}" aria-label="{% trans 'Search' %}">
                     <button class="btn btn-outline-light my-2 my-sm-0" type="submit">{% trans "Search" %}</button>
                 </form>
                 <ul class="navbar-nav ml-auto">
@@ -53,6 +53,13 @@
                     {% endif %}
                 </ul>
             </div>
+            <form action="{% url 'book_store_app:set_language' %}" method="get" class="language-selector">
+                <select name="language" onchange="this.form.submit()">
+                    <option value="en" {% if current_language == 'en' %}selected{% endif %}>English</option>
+                    <option value="fr" {% if current_language == 'fr'%}selected{% endif %}>French</option>
+                    <option value="es" {% if current_language == 'es' %}selected{% endif %}>Spanish</option>
+                </select>
+            </form>
         </nav>
     </header>
 

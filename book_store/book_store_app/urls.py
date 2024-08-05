@@ -17,5 +17,7 @@ urlpatterns=[
     path('home/shopping/', views.shopping_view, name='shopping'),
     path('home/order_page/', views.order_page_view, name='order_page'),
     path('home/orders/<int:user_id>/', views.OrdersView.as_view(), name='orders'),
-
+    path('set_language/', views.set_language, name='set_language'),
+    path('staff_dashboard/',views.staff_dashboard,name='staff_dashboard'),
+    path('staff_dashboard/updateInventory', views.update_inventory_view, name='updateInventory'),
 ]
