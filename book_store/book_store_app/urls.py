@@ -3,7 +3,7 @@ from . import views
 
 app_name = 'book_store_app'
 urlpatterns=[
-    path('home/',views.BookListView.as_view(),name="home"),
+    path('',views.BookListView.as_view(),name="home"),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/',views.register_view,name='register'),

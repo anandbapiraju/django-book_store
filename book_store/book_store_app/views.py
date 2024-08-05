@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.views.generic import ListView
 from .forms import LoginForm, RegisterForm, ProfileForm
 from .models import Book, Cart, BookSpecifications, Profile, Orders, OrderItems
+from django.utils.translation import get_language
+
+
 
 User = get_user_model()
 
@@ -14,6 +17,11 @@ class BookListView(ListView):
     model = Book
     template_name = "book_store_app/home.html"
     context_object_name = 'books'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['get_current_language'] = get_language()
+        return context
 
 
 class CartView(ListView):

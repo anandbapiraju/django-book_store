@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
+{% load i18n %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Bookstore{% endblock %}</title>
+    <title>{% block title %}{% trans "Bookstore" %}{% endblock %}</title>
     {% load static %}
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -13,37 +14,43 @@
 </head>
 <body>
     <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <a class="navbar-brand" href="#">Book Store</a>
+        <nav class="container-fluid">
+            <a class="navbar-brand" href="#">{% trans "Book Store" %}</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav mr-auto flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:home' %}"><i class="bi bi-house-door"></i> Home</a>
+                        <a class="nav-link" href="{% url 'book_store_app:home' %}"><i class="bi bi-house-door"></i> {% trans "Home" %}</a>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:cart' user.id %}"><i class="bi bi-cart"></i> Cart</a>
+                        <a class="nav-link" href="{% url 'book_store_app:cart' user.id %}"><i class="bi bi-cart"></i> {% trans "Cart" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:orders' user.id %}"><i class="bi bi-box"></i> Orders</a>
+                        <a class="nav-link" href="{% url 'book_store_app:orders' user.id %}"><i class="bi bi-box"></i> {% trans "Orders" %}</a>
                     </li>
                     {% endif %}
                 </ul>
-                <form class="form-inline my-2 my-lg-0 mx-auto" method="post" action="{% url 'book_store_app:search' %}">
+                <form class="form-inline my-2 my-lg-0" method="post" action="{% url 'book_store_app:search' %}">
                     {% csrf_token %}
                     <input class="form-control mr-sm-2" type="search" name="text" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">{% trans "Search" %}</button>
                 </form>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i> Profile</a>
+                        <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i> {% trans "Profile" %}</a>
                     </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        <a class="nav-link" href="{% url 'book_store_app:logout' %}"><i class="bi bi-box-arrow-right"></i> {% trans "Logout" %}</a>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_store_app:login' %}"><i class="bi bi-box-arrow-in-right"></i> {% trans "Login" %}</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
@@ -54,7 +61,7 @@
     </main>
 
     <footer class="bg-dark text-white text-center py-3 fixed-bottom">
-        <p class="mb-0">© 2024 Book Store. All rights reserved.</p>
+        <p class="mb-0">© 2024 {% trans "Book Store" %}. {% trans "All rights reserved." %}</p>
     </footer>
 
     {% block extra_js %}{% endblock %}

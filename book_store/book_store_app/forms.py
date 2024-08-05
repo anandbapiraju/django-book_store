@@ -32,16 +32,16 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username'})
     )
     email = forms.CharField(
-        label="UserName",
+        label="Email",
         max_length=256,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email'})
     )
     password1 = forms.CharField(
-        label="Password1",
+        label="Password",
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'})
     )
     password2 = forms.CharField(
-        label="Password2",
+        label="Confirm Password",
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password Again'})
     )
 

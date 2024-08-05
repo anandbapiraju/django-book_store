@@ -83,3 +83,23 @@ h1, h2, h3, h4, h5, h6 {
 .alert {
     margin-top: 20px;
 }
+
+/* New styles to adjust navbar spacing */
+.navbar-nav {
+    flex: 1;
+}
+
+.nav-item {
+    text-align: center;
+    margin-right: 15px; /* Add spacing between nav items */
+}
+
+.form-inline {
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.navbar-nav.ml-auto {
+    flex: 0;
+    justify-content: flex-end;
+}
