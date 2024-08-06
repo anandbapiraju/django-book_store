@@ -4,8 +4,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login
 from django.urls import reverse
 from django.utils import translation
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView
-from .forms import LoginForm, RegisterForm, ProfileForm
+from .forms import LoginForm, RegisterForm, ProfileForm, BookForm, OrderStatusForm
 from .models import Book, Cart, BookSpecifications, Profile, Orders, OrderItems
 
 
@@ -266,13 +267,99 @@ def set_language(request):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+
 @login_required(login_url='book_store_app:login')
 def staff_dashboard(request):
-    context={}
-    return render(request,'book_store_app/staff_dashboard.html',context)
+    if not request.user.is_staff:
+        return redirect('book_store_app:home')
+
+    context = {}
+    return render(request, 'book_store_app/inventory/staff_dashboard.html', context)
 
 
 @login_required(login_url='book_store_app:login')
 def update_inventory_view(request):
-    context={}
-    return render(request,'book_store_app/updateInventory.html',context)
+    books = Book.objects.all().order_by('id')
+    book_form = BookForm()
+    context = {
+        'book_form': book_form,
+        'books': books,
+    }
+    return render(request, 'book_store_app/inventory/updateInventory.html', context)
+
+
+
+@login_required(login_url='book_store_app:login')
+def add_book_view(request):
+    if request.method == 'POST':
+        book_form = BookForm(request.POST, request.FILES)
+        if book_form.is_valid():
+            book_form.save()
+    else:
+        book_form = BookForm()
+
+    return render(request, 'book_store_app/inventory/addBook.html', {'book_form': book_form})
+
+
+
+@login_required(login_url='book_store_app:login')
+def update_book_view(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        book_form = BookForm(request.POST, request.FILES, instance=book)
+        if book_form.is_valid():
+            book_form.save()
+    else:
+        book_form = BookForm(instance=book)
+
+    return render(request, 'book_store_app/inventory/updateBook.html', {'book_form': book_form})
+
+
+@login_required(login_url='book_store_app:login')
+def delete_book_view(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book.delete()
+    return redirect('book_store_app:staff_dashboard')
+
+
+@login_required(login_url='book_store_app:login')
+def order_history_view(request):
+    if not request.user.is_staff:
+        messages.error(request, "Please Login with Staff Credentials")
+        return redirect('book_store_app:login')
+    orders=Orders.objects.all().order_by('-id')
+    context = {'orders':orders}
+    return render(request, 'book_store_app/inventory/order_history.html', context)
+
+
+
+
+@login_required(login_url='book_store_app:login')
+@require_POST
+def update_order_status(request):
+    for key, value in request.POST.items():
+        if key.startswith('status_'):
+            order_id = key.split('_')[1]
+            status = value
+            try:
+                order = Orders.objects.get(id=order_id)
+                order.shipping_status = status
+                order.save()
+            except Orders.DoesNotExist:
+                continue
+    return redirect('book_store_app:staff_dashboard')
+
+
+@login_required(login_url='book_store_app:login')
+def view_reports_view(request):
+    context = {}
+    return render(request, 'book_store_app/inventory/view_reports.html', context)
+
+
+@login_required(login_url='book_store_app:login')
+def manage_users_view(request):
+    context = {}
+    return render(request, 'book_store_app/inventory/manage_users.html', context)
+
+
+

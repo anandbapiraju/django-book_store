@@ -15,16 +15,18 @@
 <body>
     <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <nav class="container-fluid">
-            <a class="navbar-brand" href="#">{% trans "Book Store" %}</a>
+            <a class="navbar-brand" href="{% url 'book_store_app:home' %}">{% trans "Book Store" %}</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mr-auto flex-grow-1">
+                    {% if not user.is_staff %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'book_store_app:home' %}"><i class="bi bi-house-door"></i> {% trans "Home" %}</a>
                     </li>
-                    {% if user.is_authenticated %}
+                    {% endif %}
+                    {% if user.is_authenticated and not user.is_staff %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'book_store_app:cart' user.id %}"><i class="bi bi-cart"></i> {% trans "Cart" %}</a>
                     </li>
@@ -32,15 +34,22 @@
                         <a class="nav-link" href="{% url 'book_store_app:orders' user.id %}"><i class="bi bi-box"></i> {% trans "Orders" %}</a>
                     </li>
                     {% endif %}
+                    {% if user.is_authenticated and user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_store_app:staff_dashboard' %}"><i class="bi bi-grid"></i> {% trans "Dashboard" %}</a>
+                    </li>
+                    {% endif %}
                 </ul>
+                {% if not user.is_staff %}
                 <form class="form-inline my-2 my-lg-0" method="post" action="{% url 'book_store_app:search' %}">
                     {% csrf_token %}
                     <input class="form-control mr-sm-2" type="search" name="text" placeholder="{% trans 'Search' %}" aria-label="{% trans 'Search' %}">
                     <button class="btn btn-outline-light my-2 my-sm-0" type="submit">{% trans "Search" %}</button>
                 </form>
+                {% endif %}
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i> {% trans "Profile" %}</a>
+                        <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i>{{user.username}}</a>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -62,12 +71,13 @@
             </form>
         </nav>
     </header>
-
-    <main class="main-content">
-        {% block content %}{% endblock %}
+    <main class="flex-grow-1">
+        <div class="container mt-5">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
-    <footer class="bg-dark text-white text-center py-3 fixed-bottom">
+    <footer class="bg-dark text-white text-center py-3">
         <p class="mb-0">© 2024 {% trans "Book Store" %}. {% trans "All rights reserved." %}</p>
     </footer>
 

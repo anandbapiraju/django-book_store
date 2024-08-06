@@ -3,7 +3,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, HTML, Div, Layout
 from django.urls import reverse
 
-from .models import Profile
+from .models import Profile, Book, Orders
 
 
 class LoginForm(forms.Form):
@@ -104,3 +104,17 @@ class ProfileForm(forms.ModelForm):
         widgets = {
             'gender': forms.Select(choices=[]),
         }
+
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ['id','book_title', 'author', 'genre', 'price', 'quantity']
+
+
+
+class OrderStatusForm(forms.ModelForm):
+    class Meta:
+        model = Orders
+        fields = ['shipping_status']
+

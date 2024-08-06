@@ -17,7 +17,7 @@
                     <p><strong>Price:</strong> ₹{{ item.book.price }}</p>
                     <p><strong>Delivering to:</strong> {{ item.order.address }}</p>
                     <p><strong>Pin Code:</strong> {{ item.order.pincode }}</p>
-                    <p>Delivery in 7 days</p>
+                    <p><strong>Shipping Status:</strong>{{ item.order.shipping_status}}</p>
                 </div>
             </li>
             {% endfor %}

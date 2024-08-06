@@ -1,4 +1,3 @@
-<!-- templates/update_inventory_content.html -->
 <div class="container">
     <h3>Update Inventory</h3>
     <div class="card">
@@ -6,14 +5,9 @@
             <h5 class="card-title">Add New Book</h5>
         </div>
         <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ book_form.as_p }}
-                <button type="submit" name="add_book" class="btn btn-primary">Add Book</button>
-            </form>
+            <a href="{% url 'book_store_app:addBook' %}" class="btn btn-primary">Add Book</a>
         </div>
     </div>
-
     <div class="card">
         <div class="card-header">
             <h5 class="card-title">Existing Books</h5>
@@ -22,6 +16,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Title</th>
                         <th>Author</th>
                         <th>Genre</th>
@@ -33,20 +28,18 @@
                 <tbody>
                     {% for book in books %}
                     <tr>
+                        <td>{{ book.id }}</td>
                         <td>{{ book.book_title }}</td>
                         <td>{{ book.author }}</td>
                         <td>{{ book.genre }}</td>
                         <td>${{ book.price }}</td>
                         <td>{{ book.quantity }}</td>
                         <td>
-                            <!-- Edit Book Form -->
-                            <form method="post" enctype="multipart/form-data" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="book_id" value="{{ book.id }}">
-                                {{ book_form.as_p }}
-                                <button type="submit" name="update_book" class="btn btn-warning btn-sm">Update</button>
-                                <button type="submit" name="delete_book" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
+                            <!-- Update Book Button -->
+                            <a href="{% url 'book_store_app:updateBook' book.id %}" class="btn btn-warning btn-sm">Update</a>
+
+                            <!-- Delete Book Button -->
+                            <a href="{% url 'book_store_app:deleteBook' book.id %}" class="btn btn-danger btn-sm">Delete</a>
                         </td>
                     </tr>
                     {% endfor %}

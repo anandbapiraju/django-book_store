@@ -58,6 +58,7 @@ class Cart(models.Model):
 
 
 class Orders(models.Model):
+    DoesNotExist = None
     objects = models.Manager()
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     total_price = models.FloatField(default=0.0)
@@ -65,7 +66,17 @@ class Orders(models.Model):
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     pincode = models.IntegerField(default=0)
     time = models.DateTimeField(auto_now_add=True)
-
+    SHIPPING_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+        ('returned', 'Returned'),
+    ]
+    shipping_status = models.CharField(
+        max_length=10,
+        choices=SHIPPING_STATUS_CHOICES,
+        default='pending',
+    )
 
     def __str__(self):
         return f"Order  by {self.user} at {self.time}"

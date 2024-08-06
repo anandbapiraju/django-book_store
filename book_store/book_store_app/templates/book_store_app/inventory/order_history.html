@@ -1,0 +1,43 @@
+{% load static %}
+<h2>Order History</h2>
+<form method="post" action="{% url 'book_store_app:update_order_status' %}">
+    {% csrf_token %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User Id</th>
+                <th>Customer</th>
+                <th>Order ID</th>
+                <th>Address</th>
+                <th>PinCode</th>
+                <th>Phone Number</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.user_id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.address }}</td>
+                    <td>{{ order.pincode }}</td>
+                    <td>{{ order.phone_number }}</td>
+                    <td>
+                        <select name="status_{{ order.id }}" class="form-control custom-select">
+                            <option value="pending" {% if order.shipping_status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="shipped" {% if order.shipping_status == 'shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if order.shipping_status == 'delivered' %}selected{% endif %}>Delivered</option>
+                            <option value="cancelled" {% if order.shipping_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+
+                    </td>
+                    <td>
+                        <button type="submit" name="order_id" value="{{ order.id }}" class="btn btn-primary">Update Status</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>

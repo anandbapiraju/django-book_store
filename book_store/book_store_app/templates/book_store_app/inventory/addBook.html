@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h3>Add New Book</h3>
+    <form action="{url 'book_store_app:addBook'}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ book_form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Book</button>
+    </form><br>
+    <a href="{%url 'book_store_app:staff_dashboard' %}"><button  class="btn btn-primary">Back</button></a>
+</div>
+
+{% endblock %}

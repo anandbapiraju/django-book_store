@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Book,BookSpecifications,Profile
+from .models import Book, BookSpecifications, Profile, Orders
+
+
 # Register your models here.
 
 
@@ -18,4 +20,12 @@ class SpecificationAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
 
     list_display = ('user','gender','address','phone_number')
+
+
+
+@admin.register(Orders)
+class ProfileAdmin(admin.ModelAdmin):
+
+    list_display = ('user_id','total_price','time','address','phone_number','pincode','shipping_status')
+
 

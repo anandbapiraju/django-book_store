@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar">
+                <h4 class="text-center">Inventory Staff</h4>
+                <a href="{% url 'book_store_app:updateInventory' %}" id="updateInventory">Update Inventory</a><br>
+                <a href="{% url 'book_store_app:order_history' %}" id="changeShippingStatus">Order History</a><br>
+                <a href="{% url 'book_store_app:view_reports' %}" id="viewReports">View Reports</a><br>
+                <a href="{% url 'book_store_app:manage_users' %}" id="manageUsers">Manage Users</a>
+            </div>
+            <!-- Main Content -->
+            <div class="col-md-9 content">
+                <div class="header">
+                    <h2>Dashboard</h2>
+                </div>
+                <div class="main-content" id="mainContent">
+                    <!-- Main content will be dynamically loaded here -->
+                    <h3>Welcome to the Inventory Dashboard</h3>
+                    <p>Select an option from the sidebar to get started.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block extra_js %}
+    <script>
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                const url = this.getAttribute('href');
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('mainContent').innerHTML = html;
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+    {% endblock %}
+{% endblock %}
