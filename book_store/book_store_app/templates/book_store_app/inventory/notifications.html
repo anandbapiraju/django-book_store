@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Alerts</h2>
+    {% if books %}
+    <div class="alert alert-warning" role="alert">
+        <strong>Attention</strong> The following books have low stock.
+    </div>
+    <ul class="list-group">
+        {% for book in books %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ book.book_title }}
+            <span class="alert alert-warning">{{ book.quantity }} left</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+        <p>All books are sufficiently stocked.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

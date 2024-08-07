@@ -109,7 +109,16 @@ class ProfileForm(forms.ModelForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['id','book_title', 'author', 'genre', 'price', 'quantity']
+        fields = ['id','book_title', 'author', 'genre', 'price', 'quantity','book_img']
+
+    def __init__(self, *args, **kwargs):
+        super(BookForm, self).__init__(*args, **kwargs)
+        self.fields['book_title'].widget.attrs.update({'class': 'form-control'})
+        self.fields['author'].widget.attrs.update({'class': 'form-control'})
+        self.fields['genre'].widget.attrs.update({'class': 'form-control'})
+        self.fields['price'].widget.attrs.update({'class': 'form-control'})
+        self.fields['quantity'].widget.attrs.update({'class': 'form-control'})
+        self.fields['book_img'].widget.attrs.update({'class': 'form-control'})
 
 
 

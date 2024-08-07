@@ -74,9 +74,9 @@ footer {
 }
 
 .content {
-    padding-top: 20px; /* Ensure spacing between sidebar and content */
+    padding-top: 20px;
     padding-bottom: 20px;
-    margin-left: 25%; /* Offset for sidebar */
+    margin-left: 25%;
 }
 
 .main-content {
@@ -109,6 +109,28 @@ h1, h2, h3, h4, h5, h6 {
     flex: 0;
     justify-content: flex-end;
 }
-.custom-select {
-    width: 200px;
+
+.position-relative {
+    position: relative;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
+.top-0 {
+    top: 0;
+}
+
+.start-100 {
+    left: 100%;
+}
+
+.translate-middle {
+    transform: translate(-50%, -50%);
+}
+
+.badge {
+    font-size: 0.75rem;
+    display: none; /* Default to hidden, will be shown by JavaScript if needed */
 }

@@ -11,8 +11,7 @@
                 <h4 class="text-center">Inventory Staff</h4>
                 <a href="{% url 'book_store_app:updateInventory' %}" id="updateInventory">Update Inventory</a><br>
                 <a href="{% url 'book_store_app:order_history' %}" id="changeShippingStatus">Order History</a><br>
-                <a href="{% url 'book_store_app:view_reports' %}" id="viewReports">View Reports</a><br>
-                <a href="{% url 'book_store_app:manage_users' %}" id="manageUsers">Manage Users</a>
+
             </div>
             <!-- Main Content -->
             <div class="col-md-9 content">
@@ -21,8 +20,14 @@
                 </div>
                 <div class="main-content" id="mainContent">
                     <!-- Main content will be dynamically loaded here -->
+                    {% if not messages %}
                     <h3>Welcome to the Inventory Dashboard</h3>
                     <p>Select an option from the sidebar to get started.</p>
+                    {% else %}
+                    {% for message in messages %}
+                    <p><strong>Inventory Updated Successfully</strong></p>
+                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>

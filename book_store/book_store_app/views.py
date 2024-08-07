@@ -1,10 +1,10 @@
+from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login
 from django.urls import reverse
 from django.utils import translation
-from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 from .forms import LoginForm, RegisterForm, ProfileForm, BookForm, OrderStatusForm
 from .models import Book, Cart, BookSpecifications, Profile, Orders, OrderItems
@@ -280,39 +280,34 @@ def staff_dashboard(request):
 @login_required(login_url='book_store_app:login')
 def update_inventory_view(request):
     books = Book.objects.all().order_by('id')
-    book_form = BookForm()
+    if request.method == 'POST':
+        for book in books:
+            book_id = book.id
+            book.book_title = request.POST.get(f'book_title_{book_id}')
+            book.author = request.POST.get(f'book_author_{book_id}')
+            book.genre = request.POST.get(f'book_genre_{book_id}')
+            book.price = request.POST.get(f'book_price_{book_id}').replace('$', '')
+            book.quantity = request.POST.get(f'book_quantity_{book_id}')
+            book.save()
+        messages.success(request, 'Inventory updated successfully!')
+        return redirect('book_store_app:staff_dashboard')
     context = {
-        'book_form': book_form,
         'books': books,
     }
     return render(request, 'book_store_app/inventory/updateInventory.html', context)
 
 
-
 @login_required(login_url='book_store_app:login')
 def add_book_view(request):
-    if request.method == 'POST':
-        book_form = BookForm(request.POST, request.FILES)
-        if book_form.is_valid():
-            book_form.save()
+    if request.method == "POST":
+        form = BookForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('book_store_app:staff_dashboard')
     else:
-        book_form = BookForm()
+        form = BookForm()
 
-    return render(request, 'book_store_app/inventory/addBook.html', {'book_form': book_form})
-
-
-
-@login_required(login_url='book_store_app:login')
-def update_book_view(request, book_id):
-    book = get_object_or_404(Book, id=book_id)
-    if request.method == 'POST':
-        book_form = BookForm(request.POST, request.FILES, instance=book)
-        if book_form.is_valid():
-            book_form.save()
-    else:
-        book_form = BookForm(instance=book)
-
-    return render(request, 'book_store_app/inventory/updateBook.html', {'book_form': book_form})
+    return render(request, 'book_store_app/inventory/addBook.html', {'form': form})
 
 
 @login_required(login_url='book_store_app:login')
@@ -320,6 +315,27 @@ def delete_book_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book.delete()
     return redirect('book_store_app:staff_dashboard')
+
+
+@login_required(login_url='book_store_app:login')
+def book_specifications_view(request,book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book_specs = get_object_or_404(BookSpecifications, book=book)
+    if request.method=="POST":
+        if 'book_img' in request.FILES:
+            book.book_img = request.FILES['book_img']
+            book.save()
+        book_specs.book_code=request.POST.get('book_code')
+        book_specs.publisher=request.POST.get('publisher')
+        publish_date_str = request.POST.get('publish_date')
+        if publish_date_str:
+            book_specs.publish_date = datetime.strptime(publish_date_str, '%Y-%m-%d').date()
+        book_specs.pages=request.POST.get('pages')
+        book_specs.description=request.POST.get('description')
+        book_specs.save()
+        return redirect('book_store_app:staff_dashboard')
+    context = {'book_specs': book_specs}
+    return render(request, 'book_store_app/inventory/book_specifications.html', context)
 
 
 @login_required(login_url='book_store_app:login')
@@ -335,31 +351,29 @@ def order_history_view(request):
 
 
 @login_required(login_url='book_store_app:login')
-@require_POST
-def update_order_status(request):
-    for key, value in request.POST.items():
-        if key.startswith('status_'):
-            order_id = key.split('_')[1]
-            status = value
-            try:
-                order = Orders.objects.get(id=order_id)
-                order.shipping_status = status
-                order.save()
-            except Orders.DoesNotExist:
-                continue
+def update_order_view(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        try:
+            order = Orders.objects.get(id=order_id)
+            order.address = request.POST.get(f'address_{order_id}')
+            order.pincode = request.POST.get(f'pincode_{order_id}')
+            order.phone_number = request.POST.get(f'phone_number_{order_id}')
+            order.shipping_status = request.POST.get(f'status_{order_id}')
+            order.save()
+        except Orders.DoesNotExist:
+            print("No Order Exists")
+            pass
     return redirect('book_store_app:staff_dashboard')
 
 
-@login_required(login_url='book_store_app:login')
-def view_reports_view(request):
-    context = {}
-    return render(request, 'book_store_app/inventory/view_reports.html', context)
-
 
 @login_required(login_url='book_store_app:login')
-def manage_users_view(request):
-    context = {}
-    return render(request, 'book_store_app/inventory/manage_users.html', context)
-
-
-
+def notifications_view(request):
+    low_stock_books = Book.objects.filter(quantity__lte=25)
+    books_count = low_stock_books.count()
+    context = {
+        'books': low_stock_books,
+        'books_count': books_count
+    }
+    return render(request,'book_store_app/inventory/notifications.html',context)

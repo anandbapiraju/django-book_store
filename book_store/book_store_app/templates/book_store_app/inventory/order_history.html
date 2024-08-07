@@ -1,6 +1,21 @@
-{% load static %}
+<style>
+    .wide-input,custom-select{
+      width: auto;
+    }
+    .wide-input,.pincode-input,.phone-input {
+         border: none;
+         outline: none;
+         background-color: transparent;
+    }
+     .pincode-input {
+        width: 80px;
+    }
+    .phone-input {
+        width: 120px;
+    }
+</style>
 <h2>Order History</h2>
-<form method="post" action="{% url 'book_store_app:update_order_status' %}">
+<form method="post" action="{% url 'book_store_app:update_order' %}">
     {% csrf_token %}
     <table class="table">
         <thead>
@@ -21,9 +36,15 @@
                     <td>{{ order.user_id }}</td>
                     <td>{{ order.user.username }}</td>
                     <td>{{ order.id }}</td>
-                    <td>{{ order.address }}</td>
-                    <td>{{ order.pincode }}</td>
-                    <td>{{ order.phone_number }}</td>
+                    <td>
+                        <textarea name="address_{{ order.id }}" class="form-control wide-input" required>{{ order.address }}</textarea>
+                    </td>
+                    <td>
+                        <input type="text" name="pincode_{{ order.id }}" value="{{ order.pincode }}" class="form-control pincode-input" required>
+                    </td>
+                    <td>
+                        <input type="text" name="phone_number_{{ order.id }}" value="{{ order.phone_number }}" class="form-control phone-input" required>
+                    </td>
                     <td>
                         <select name="status_{{ order.id }}" class="form-control custom-select">
                             <option value="pending" {% if order.shipping_status == 'pending' %}selected{% endif %}>Pending</option>
@@ -31,10 +52,9 @@
                             <option value="delivered" {% if order.shipping_status == 'delivered' %}selected{% endif %}>Delivered</option>
                             <option value="cancelled" {% if order.shipping_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
                         </select>
-
                     </td>
                     <td>
-                        <button type="submit" name="order_id" value="{{ order.id }}" class="btn btn-primary">Update Status</button>
+                        <button type="submit" name="order_id" value="{{ order.id }}" class="btn btn-primary">Update Order</button>
                     </td>
                 </tr>
             {% endfor %}

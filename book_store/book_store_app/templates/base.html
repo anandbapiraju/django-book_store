@@ -38,6 +38,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'book_store_app:staff_dashboard' %}"><i class="bi bi-grid"></i> {% trans "Dashboard" %}</a>
                     </li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="{% url 'book_store_app:notifications' %}">
+                            <i class="bi bi-bell"></i> {% trans "Alerts" %}
+                            {% if books_count > 0 %}
+                            <span class="badge rounded-pill">{{ books_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
                 {% if not user.is_staff %}
@@ -49,7 +57,7 @@
                 {% endif %}
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i>{{user.username}}</a>
+                        <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i>{{ user.username }}</a>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -71,6 +79,7 @@
             </form>
         </nav>
     </header>
+
     <main class="flex-grow-1">
         <div class="container mt-5">
             {% block content %}{% endblock %}
