@@ -65,8 +65,10 @@ def logout_view(request):
 
 def register_view(request):
     context = {'form': RegisterForm()}
+    print("request.method=",request.method)
     if request.method == "POST":
         form = RegisterForm(request.POST)
+        print("post request called")
         if form.is_valid():
             user_name = form.cleaned_data['username']
             email = form.cleaned_data['email']
