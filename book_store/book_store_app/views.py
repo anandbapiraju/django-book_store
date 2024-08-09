@@ -1,18 +1,14 @@
 from datetime import datetime
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import get_user_model, authenticate, login
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import translation
-from django.views.generic import ListView
-from .forms import LoginForm, RegisterForm, ProfileForm, BookForm, OrderStatusForm
+from django.views.generic import ListView, FormView, UpdateView
+from .forms import LoginForm, ProfileForm, BookForm,CustomUserCreationForm
 from .models import Book, Cart, BookSpecifications, Profile, Orders, OrderItems
+from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
+from django.views import View
 
-
-
-
-User = get_user_model()
 
 
 class BookListView(ListView):
@@ -37,76 +33,57 @@ class CartView(ListView):
         return context
 
 
-def login_view(request):
-    context = {'form': LoginForm()}
-    if request.method == 'POST':
-        print("login view is called..... post method called")
-        print('request_method==>', request.POST)
-        user_name = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=user_name, password=password)
-        print(f'authenticated user: {user}')
-        if user is not None:
-            print("user is not none")
-            login(request, user)
-            context['current_user'] = request.user
-            return redirect('book_store_app:home')
-        else:
-            context['message'] = 'Invalid login credentials'
-    else:
-        print("login view is called..... get method called")
-    return render(request, 'book_store_app/login.html', context)
+class CustomLoginView(View):
+    def get(self, request):
+        form = LoginForm()
+        return render(request, 'book_store_app/login.html', {'form': form})
 
-
-def logout_view(request):
-    request.session.flush()
-    return redirect(reverse("book_store_app:login"))
-
-
-def register_view(request):
-    context = {'form': RegisterForm()}
-    print("request.method=",request.method)
-    if request.method == "POST":
-        form = RegisterForm(request.POST)
-        print("post request called")
+    def post(self, request):
+        form = LoginForm(request.POST)
         if form.is_valid():
-            user_name = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            password1 = form.cleaned_data['password1']
-            password2 = form.cleaned_data['password2']
-
-            if password1 != password2:
-                context['message'] = 'Password Mismatch!!'
-            elif User.objects.filter(username=user_name).exists():
-                context['message'] = 'User Already Exists'
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                auth_login(request, user)
+                return redirect('book_store_app:home')
             else:
-                User.objects.create_user(username=user_name, email=email, password=password1)
-                messages.success(request, 'Account created successfully! Login Here')
-                return redirect('book_store_app:login')
-
-    return render(request, 'book_store_app/register.html', context)
+                return render(request, 'book_store_app/login.html', {'form': form, 'message': 'Invalid login credentials'})
+        return render(request, 'book_store_app/login.html', {'form': form})
 
 
-@login_required(login_url='book_store_app:login')
-def my_profile(request):
-    user = request.user
-    profile = user.profile
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            print(profile.gender)
-            return redirect('book_store_app:home')
-    else:
-        form = ProfileForm(instance=profile)
-    context = {
-        'user': user,
-        'form': form
-    }
-    return render(request, 'book_store_app/my_profile.html', context)
+class CustomLogoutView(View):
+    def get(self, request, *args, **kwargs):
+        auth_logout(request)
+        return redirect(reverse('book_store_app:login'))
 
 
-@login_required(login_url='book_store_app:login')
+class RegisterView(FormView):
+    template_name='book_store_app/register.html'
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('book_store_app:login')
+
+    def form_valid(self,form):
+        form.save()
+        messages.success(self.request, 'Registration successful! You can now log in.')
+        return super().form_valid(form)
+
+
+class MyProfileView(UpdateView):
+    model = Profile
+    form_class = ProfileForm
+    template_name = 'book_store_app/my_profile.html'
+    success_url = reverse_lazy('book_store_app:home')
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
 def add_to_cart_view(request):
     if request.method == 'POST':
         units = int(request.POST.get('quantity', 1))
@@ -134,7 +111,6 @@ def add_to_cart_view(request):
     return redirect('book_store_app:home')
 
 
-@login_required(login_url='book_store_app:login')
 def update_cart_view(request):
     context = {'cart_items': Cart.objects.filter(user=request.user)}
     if request.method == 'POST':
@@ -156,7 +132,6 @@ def update_cart_view(request):
     return render(request, 'book_store_app/cart.html', context)
 
 
-@login_required(login_url='book_store_app:login')
 def book_details_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book_specs = get_object_or_404(BookSpecifications, book=book)
@@ -164,14 +139,12 @@ def book_details_view(request, book_id):
     return render(request, 'book_store_app/book_details.html', context)
 
 
-@login_required(login_url='book_store_app:login')
 def delete_item_view(request, item_id):
     cart = get_object_or_404(Cart, id=item_id, user=request.user)
     cart.delete()
     return redirect('book_store_app:cart',user_id=request.user.id)
 
 
-@login_required(login_url='book_store_app:login')
 def search_view(request):
     search_text = ''
     if request.method == 'POST':
@@ -191,7 +164,6 @@ def search_view(request):
     return render(request, 'book_store_app/search_results.html', context)
 
 
-@login_required(login_url='book_store_app:login')
 def shopping_view(request):
     profile = Profile.objects.get(user=request.user)
     context = {'profile': profile}
@@ -203,8 +175,7 @@ def shopping_view(request):
     return render(request, 'book_store_app/shopping.html', context)
 
 
-@login_required(login_url='book_store_app:login')
-def order_page_view(request):
+def checkout_view(request):
     context = {}
 
     if request.method == 'POST':
@@ -246,7 +217,7 @@ def order_page_view(request):
                 'success': "Order placed successfully!"
             }
 
-    return render(request, 'book_store_app/order_page.html', context)
+    return render(request, 'book_store_app/checkout.html', context)
 
 
 class OrdersView(ListView):
@@ -270,7 +241,6 @@ def set_language(request):
 
 
 
-@login_required(login_url='book_store_app:login')
 def staff_dashboard(request):
     if not request.user.is_staff:
         return redirect('book_store_app:home')
@@ -279,7 +249,6 @@ def staff_dashboard(request):
     return render(request, 'book_store_app/inventory/staff_dashboard.html', context)
 
 
-@login_required(login_url='book_store_app:login')
 def update_inventory_view(request):
     books = Book.objects.all().order_by('id')
     if request.method == 'POST':
@@ -299,7 +268,6 @@ def update_inventory_view(request):
     return render(request, 'book_store_app/inventory/updateInventory.html', context)
 
 
-@login_required(login_url='book_store_app:login')
 def add_book_view(request):
     if request.method == "POST":
         form = BookForm(request.POST, request.FILES)
@@ -312,14 +280,12 @@ def add_book_view(request):
     return render(request, 'book_store_app/inventory/addBook.html', {'form': form})
 
 
-@login_required(login_url='book_store_app:login')
 def delete_book_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book.delete()
     return redirect('book_store_app:staff_dashboard')
 
 
-@login_required(login_url='book_store_app:login')
 def book_specifications_view(request,book_id):
     book = get_object_or_404(Book, id=book_id)
     book_specs = get_object_or_404(BookSpecifications, book=book)
@@ -340,7 +306,6 @@ def book_specifications_view(request,book_id):
     return render(request, 'book_store_app/inventory/book_specifications.html', context)
 
 
-@login_required(login_url='book_store_app:login')
 def order_history_view(request):
     if not request.user.is_staff:
         messages.error(request, "Please Login with Staff Credentials")
@@ -352,7 +317,6 @@ def order_history_view(request):
 
 
 
-@login_required(login_url='book_store_app:login')
 def update_order_view(request):
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
@@ -370,7 +334,6 @@ def update_order_view(request):
 
 
 
-@login_required(login_url='book_store_app:login')
 def notifications_view(request):
     low_stock_books = Book.objects.filter(quantity__lte=25)
     books_count = low_stock_books.count()

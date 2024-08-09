@@ -1,0 +1,67 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-08-05 12:18+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+
+#: book_store_app/templates/base.html:7
+msgid "Bookstore"
+msgstr "Librairie"
+
+#: book_store_app/templates/base.html:18 book_store_app/templates/base.html:64
+msgid "Book Store"
+msgstr "Librairie"
+
+#: book_store_app/templates/base.html:25
+#: book_store_app/templates/book_store_app/home.html:4
+msgid "Home"
+msgstr "Accueil"
+
+#: book_store_app/templates/base.html:29
+msgid "Cart"
+msgstr "Panier"
+
+#: book_store_app/templates/base.html:32
+msgid "Orders"
+msgstr "Commandes"
+
+#: book_store_app/templates/base.html:38 book_store_app/templates/base.html:39
+msgid "Search"
+msgstr "Recherche"
+
+#: book_store_app/templates/base.html:43
+msgid "Profile"
+msgstr "Profil"
+
+#: book_store_app/templates/base.html:47
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: book_store_app/templates/base.html:51
+msgid "Login"
+msgstr "Connexion"
+
+#: book_store_app/templates/base.html:64
+msgid "All rights reserved."
+msgstr "Tous droits réservés."
+
+#: book_store_app/templates/book_store_app/home.html:8
+msgid "Featured Books"
+msgstr "Livres en vedette"
+
+#: book_store_app/templates/book_store_app/home.html:18
+msgid "Price:"
+msgstr "Prix :"

@@ -9,6 +9,7 @@
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <a href="{% url 'book_store_app:staff_dashboard' %}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 {% endblock %}

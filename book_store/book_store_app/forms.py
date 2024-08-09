@@ -1,21 +1,22 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, HTML, Div, Layout
-from django.urls import reverse
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.urls import reverse, reverse_lazy
 
 from .models import Profile, Book, Orders
 
 
 class LoginForm(forms.Form):
-
     username = forms.CharField(
-            label="UserName",
-            max_length=256,
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username'})
+        label="Username",
+        max_length=256,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username'})
     )
     password = forms.CharField(
-            label="Password",
-            widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'})
+        label="Password",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'})
     )
 
     def __init__(self, *args, **kwargs):
@@ -23,87 +24,46 @@ class LoginForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Login'))
-        self.helper.form_action = reverse('book_store_app:login')
 
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True,
+                             widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email'}))
 
-class RegisterForm(forms.Form):
-    username = forms.CharField(
-        label="UserName",
-        max_length=256,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username'})
-    )
-    email = forms.CharField(
-        label="Email",
-        max_length=256,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email'})
-    )
-    password1 = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'})
-    )
-    password2 = forms.CharField(
-        label="Confirm Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password Again'})
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Register'))
-        self.helper.form_action = reverse('book_store_app:register')
-
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
 
 
 class ProfileForm(forms.ModelForm):
-    first_name = forms.CharField(required=False)
-    last_name = forms.CharField(required=False)
+    first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    last_name = forms.CharField(max_length=30,required=False)
     email = forms.EmailField(required=False)
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            Div(
-                'first_name',
-                'last_name',
-                'email',
-                'gender',
-                'address',
-                'phone_number',
-                css_class='form-group'
-            ),
-            Div(
-                Submit('submit', 'Update Profile', css_class='btn btn-primary'),
-                HTML('<a href="{% url "book_store_app:home" %}" class="btn btn-secondary">Cancel</a>'),
-                css_class='form-group'
-            )
-        )
-        self.helper.form_action = "/home/my_profile/"
+        if user:
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
+        self.user = user
 
-        if self.instance and hasattr(self.instance, 'user'):
-            self.fields['first_name'].initial = self.instance.user.first_name
-            self.fields['last_name'].initial = self.instance.user.last_name
-            self.fields['email'].initial = self.instance.user.email
 
     def save(self, commit=True):
         profile = super().save(commit=False)
-        user = profile.user
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.email = self.cleaned_data['email']
         if commit:
-            user.save()
             profile.save()
+        # Update user details
+        if self.user:
+            self.user.first_name = self.cleaned_data['first_name']
+            self.user.last_name = self.cleaned_data['last_name']
+            self.user.email = self.cleaned_data['email']
+            self.user.save()
         return profile
 
     class Meta:
         model = Profile
-        fields = ['first_name', 'last_name', 'email', 'gender', 'address', 'phone_number']
-        widgets = {
-            'gender': forms.Select(choices=[]),
-        }
+        fields = ['phone_number', 'gender', 'address']
 
 
 class BookForm(forms.ModelForm):

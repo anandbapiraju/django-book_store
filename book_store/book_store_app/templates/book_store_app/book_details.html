@@ -13,6 +13,7 @@
             <h2>{{ book.title }}</h2>
             <p><strong>Author:</strong> {{ book.author }}</p>
             <p><strong>Price:</strong> ₹{{ book.price }}</p>
+            {% if user.is_authenticated %}
             <form action="{% url 'book_store_app:add_to_cart' %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="book_id" value="{{ book.id }}">
@@ -30,6 +31,9 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Add to Cart</button>
             </form>
+            {% else %}
+            <p><strong>Please Login to Add to Cart</strong></p>
+            {% endif %}
             <div class="mt-4">
                 <h3>Book Specifications</h3>
                 <table class="table">
