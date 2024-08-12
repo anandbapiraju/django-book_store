@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import translation
 from django.views.generic import ListView, FormView, UpdateView
-from .forms import LoginForm, ProfileForm, BookForm,CustomUserCreationForm
+from .forms import LoginForm, ProfileForm, BookForm, RegisterForm
 from .models import Book, Cart, BookSpecifications, Profile, Orders, OrderItems
 from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
 from django.views import View
@@ -59,12 +59,14 @@ class CustomLogoutView(View):
 
 
 class RegisterView(FormView):
-    template_name='book_store_app/register.html'
-    form_class = CustomUserCreationForm
+    template_name = 'book_store_app/register.html'
+    form_class = RegisterForm
     success_url = reverse_lazy('book_store_app:login')
 
-    def form_valid(self,form):
-        form.save()
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data['password1'])
+        user.save()
         messages.success(self.request, 'Registration successful! You can now log in.')
         return super().form_valid(form)
 
