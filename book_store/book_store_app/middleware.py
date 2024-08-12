@@ -11,9 +11,10 @@ class LoginRequiredMiddleware:
         if request.path.startswith(reverse('book_store_app:login')) or request.path.startswith('/static/') or request.path.startswith(reverse('book_store_app:home')):
             return self.get_response(request)
 
-        # Redirect to login if the user is not authenticated
         if not request.user.is_authenticated:
             return redirect(reverse('book_store_app:login'))
 
         return self.get_response(request)
+
+
 

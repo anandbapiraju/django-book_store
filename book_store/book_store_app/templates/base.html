@@ -56,10 +56,10 @@
                 </form>
                 {% endif %}
                 <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'book_store_app:my_profile' %}"><i class="bi bi-person"></i>{{ user.username }}</a>
                     </li>
-                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'book_store_app:logout' %}"><i class="bi bi-box-arrow-right"></i> {% trans "Logout" %}</a>
                     </li>

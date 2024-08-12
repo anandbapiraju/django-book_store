@@ -78,7 +78,7 @@ class ProfileForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['first_name'].initial = user.first_name
+            self.fields['first_name'].initial = user.username
             self.fields['last_name'].initial = user.last_name
             self.fields['email'].initial = user.email
         self.user = user
