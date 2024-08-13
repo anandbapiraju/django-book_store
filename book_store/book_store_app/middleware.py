@@ -7,7 +7,6 @@ class LoginRequiredMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Skip the check for the login page and static files
         if request.path.startswith(reverse('book_store_app:login')) or request.path.startswith('/static/') or request.path.startswith(reverse('book_store_app:home')):
             return self.get_response(request)
 
