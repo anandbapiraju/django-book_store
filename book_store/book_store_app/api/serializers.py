@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
-from ..models import Book, Cart, Profile, Orders, OrderItems, BookSpecifications
+from ..models import Book, Cart, Profile, Orders, OrderItems, BookSpecifications,User
+from django.contrib.auth.models import User
 
 
 class CustomLoginSerializer(serializers.Serializer):
@@ -8,30 +9,17 @@ class CustomLoginSerializer(serializers.Serializer):
     password=serializers.CharField(write_only=True)
 
 
-class BookSerializer(serializers.ModelSerializer):
-    book_img = serializers.ImageField(required=False)
-
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Book
-        fields = ['book_title', 'author', 'genre', 'price', 'quantity', 'book_img']
-
-
-
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = '__all__'
+        model = User
+        fields ='__all__'
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    user= UserSerializer(read_only=True)
+
     class Meta:
         model = Profile
-        fields = '__all__'
-
-
-class OrdersSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Orders
         fields = '__all__'
 
 
@@ -41,9 +29,34 @@ class OrderItemsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrdersSerializer(serializers.ModelSerializer):
+    orders=OrderItemsSerializer(many=True,read_only=True)
+
+    class Meta:
+        model = Orders
+        fields = '__all__'
+
+
 class BookSpecificationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookSpecifications
+        fields = '__all__'
+
+
+class BookSerializer(serializers.ModelSerializer):
+    book_img = serializers.ImageField(required=False)
+    book_specs=BookSpecificationsSerializer(read_only=True)
+
+    class Meta:
+        model = Book
+        fields = ['book_title', 'author', 'genre', 'price', 'quantity', 'book_img']
+
+
+class CartSerializer(serializers.ModelSerializer):
+    book=BookSerializer(read_only=True)
+
+    class Meta:
+        model = Cart
         fields = '__all__'
 
 
