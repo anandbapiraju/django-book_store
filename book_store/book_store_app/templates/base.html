@@ -31,7 +31,7 @@
                         <a class="nav-link" href="{% url 'book_store_app:cart' user.id %}"><i class="bi bi-cart"></i> {% trans "Cart" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_store_app:orders' user.id %}"><i class="bi bi-box"></i> {% trans "Orders" %}</a>
+                        <a class="nav-link" href="{% url 'book_store_app:orders' %}"><i class="bi bi-box"></i> {% trans "Orders" %}</a>
                     </li>
                     {% endif %}
                     {% if user.is_authenticated and user.is_staff %}
@@ -85,11 +85,11 @@
             {% block content %}{% endblock %}
         </div>
     </main>
-
+    {% if show_footer %}
     <footer class="bg-dark text-white text-center py-3">
         <p class="mb-0">© 2024 {% trans "Book Store" %}. {% trans "All rights reserved." %}</p>
     </footer>
-
+    {% endif %}
     {% block extra_js %}{% endblock %}
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

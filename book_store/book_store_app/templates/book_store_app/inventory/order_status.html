@@ -1,0 +1,71 @@
+{% extends 'book_store_app/inventory/staff_dashboard.html' %}
+{% block content %}
+<div class="container">
+    <h3>Order Status</h3>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Orders</h5>
+        </div>
+        <div class="card-body">
+            <!-- Form for updating order statuses -->
+            <form method="post" action="{% url 'book_store_app:orderStatus' %}">
+                {% csrf_token %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Order Date</th>
+                            <th>Shipping Status</th>
+                            <th>Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.user }}</td>
+                            <td>{{ order.time }}</td>
+                            <td>{{ order.shipping_status }}</td>
+                            <td>
+                                <select name="order_status_{{ order.id }}" class="form-control">
+                                    <option value="Pending" {% if order.shipping_status == "Pending" %}selected{% endif %}>Pending</option>
+                                    <option value="Shipped" {% if order.shipping_status == "Shipped" %}selected{% endif %}>Shipped</option>
+                                    <option value="Delivered" {% if order.shipping_status == "Delivered" %}selected{% endif %}>Delivered</option>
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">Update Status</button>
+                <!-- Back button -->
+                <button type="button"><a href="{% url 'book_store_app:staff_dashboard' %}">Back</a></button>
+            </form>
+
+            <!-- Pagination links -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}&status={{ status_filter }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

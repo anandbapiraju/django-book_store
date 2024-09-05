@@ -11,12 +11,12 @@ __pycache__/
 /TABLES
 
 #envoiment variable
-.env
+.env/
 
 #virtual
-.venv/
+venv/
 
 __init__.py
 
-media/
+
 

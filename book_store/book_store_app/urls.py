@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'book_store_app'
@@ -16,14 +16,16 @@ urlpatterns=[
     path('home/search/',views.search_view,name='search'),
     path('home/shopping/', views.shopping_view, name='shopping'),
     path('home/checkout/', views.checkout_view, name='checkout'),
-    path('home/orders/<int:user_id>/', views.OrdersView.as_view(), name='orders'),
+    path('orders/', views.orders_view, name='orders'),
     path('set_language/', views.set_language, name='set_language'),
     path('staff_dashboard/',views.staff_dashboard,name='staff_dashboard'),
     path('staff_dashboard/updateInventory/', views.update_inventory_view, name='updateInventory'),
-    path('staff_dashboard/order_history/', views.order_history_view, name='order_history'),
     path('staff_dashboard/update_order/', views.update_order_view, name='update_order'),
     path('staff_dashboard/addBook/', views.add_book_view, name='addBook'),
     path('staff_dashboard/deleteBook/<int:book_id>/', views.delete_book_view, name='deleteBook'),
     path('staff_dashboard/book_specifications/<int:book_id>/', views.book_specifications_view, name='book_specifications'),
-    path('staff_dashboard/notifications', views.notifications_view, name='notifications' ),
+    path('staff_dashboard/notifications', views.notifications_view, name='notifications'),
+    path('staff_dashboard/viewInventory', views.view_inventory, name='viewInventory'),
+    path('staff_dashboard/viewOrders', views.view_orders, name='viewOrders'),
+    path('staff_dashboard/orderStatus', views.order_status_view, name='orderStatus'),
 ]

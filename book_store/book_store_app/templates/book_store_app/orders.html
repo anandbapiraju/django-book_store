@@ -10,14 +10,15 @@
         <ul class="list-group">
             {% for item in order_items %}
             <li class="list-group-item d-flex align-items-center">
-                <img src="{{ item.book.book_img.url }}" alt="{{ item.book.title }}" class="img-thumbnail mr-3" style="width: 100px;">
+                <img src="{{ item.book.book_img.url }}" alt="{{ item.book.book_title }}" class="img-thumbnail mr-3" style="width: 100px;">
                 <div class="d-flex flex-column">
                     <p><strong>Book:</strong> {{ item.book.book_title }}</p>
                     <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-                    <p><strong>Price:</strong> ₹{{ item.book.price }}</p>
+                    <p><strong>Price per Unit:</strong> ₹{{ item.book.price }}</p>
+                    <p><strong>Total Price:</strong> ₹{{ item.order.total_price }} </p>
                     <p><strong>Delivering to:</strong> {{ item.order.address }}</p>
                     <p><strong>Pin Code:</strong> {{ item.order.pincode }}</p>
-                    <p><strong>Shipping Status:</strong>{{ item.order.shipping_status}}</p>
+                    <p><strong>Shipping Status:</strong> {{ item.order.shipping_status }}</p>
                 </div>
             </li>
             {% endfor %}
