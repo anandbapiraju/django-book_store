@@ -1,26 +1,59 @@
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
-from ..models import Book, Cart, Profile, Orders, OrderItems, BookSpecifications,User
+from ..models import Book, Cart, Profile, Orders, OrderItems, BookSpecifications
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.validators import UniqueValidator
 
 
-class CustomLoginSerializer(serializers.Serializer):
-    username=serializers.CharField()
-    password=serializers.CharField(write_only=True)
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password]
+    )
+    password2 = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = User
-        fields ='__all__'
+        fields = ['username', 'password', 'password2', 'email']
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Passwords must match."})
+        return attrs
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user= UserSerializer(read_only=True)
-
     class Meta:
         model = Profile
         fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'profile']
 
 
 class OrderItemsSerializer(serializers.ModelSerializer):
@@ -30,11 +63,11 @@ class OrderItemsSerializer(serializers.ModelSerializer):
 
 
 class OrdersSerializer(serializers.ModelSerializer):
-    orders=OrderItemsSerializer(many=True,read_only=True)
+    order_items = OrderItemsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Orders
-        fields = '__all__'
+        fields ='__all__'
 
 
 class BookSpecificationsSerializer(serializers.ModelSerializer):
@@ -44,35 +77,25 @@ class BookSpecificationsSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
-    book_img = serializers.ImageField(required=False)
-    book_specs=BookSpecificationsSerializer(read_only=True)
+    book_specs = BookSpecificationsSerializer(read_only=True)
 
     class Meta:
         model = Book
-        fields = ['book_title', 'author', 'genre', 'price', 'quantity', 'book_img']
+        fields = ['id', 'book_title', 'author', 'genre', 'price', 'quantity', 'book_img', 'book_specs']
 
 
-class CartSerializer(serializers.ModelSerializer):
-    book=BookSerializer(read_only=True)
-
-    class Meta:
-        model = Cart
-        fields = '__all__'
-
-
-class AddOrUpdateCartSerializer(serializers.Serializer):
+class CartSerializer(serializers.Serializer):
     book_id = serializers.IntegerField()
     quantity = serializers.IntegerField(min_value=1, default=1)
 
     def validate(self, data):
-        # Ensure the book exists
-        book = get_object_or_404(Book, id=data['book_id'])
+        book = Book.objects.filter(id=data['book_id']).first()
+        if not book:
+            raise serializers.ValidationError("Book does not exist.")
 
-        # Check if the requested quantity is available
         if data['quantity'] > book.quantity:
-            raise serializers.ValidationError(f"Only {book.quantity} units available for {book.title}.")
+            raise serializers.ValidationError(f"Only {book.quantity} units available for this book.")
 
-        # Store the book object in the validated data for use in the create/update methods
         data['book'] = book
         return data
 
@@ -81,15 +104,12 @@ class AddOrUpdateCartSerializer(serializers.Serializer):
         book = validated_data['book']
         quantity = validated_data['quantity']
 
-        # Create or update the cart item
         cart_item, created = Cart.objects.get_or_create(user=user, book=book)
 
-        # If the item already exists in the cart, update the quantity
         if not created:
             new_quantity = cart_item.quantity + quantity
             if new_quantity > book.quantity:
-                raise serializers.ValidationError(
-                    f"Only {book.quantity - cart_item.quantity} more units available for {book.title}.")
+                raise serializers.ValidationError(f"Only {book.quantity - cart_item.quantity} more units available.")
             cart_item.quantity = new_quantity
         else:
             cart_item.quantity = quantity
@@ -98,18 +118,13 @@ class AddOrUpdateCartSerializer(serializers.Serializer):
         return cart_item
 
     def update(self, instance, validated_data):
-        # Update the existing cart item
         book = validated_data['book']
         quantity = validated_data['quantity']
 
-        # Check if the requested quantity is available for the book
         if quantity > book.quantity:
-            raise serializers.ValidationError(f"Only {book.quantity} units available for {book.title}.")
+            raise serializers.ValidationError(f"Only {book.quantity} units available for this book.")
 
         instance.quantity = quantity
         instance.save()
         return instance
 
-
-class StaffDashboardSerializer(serializers.Serializer):
-    pass
