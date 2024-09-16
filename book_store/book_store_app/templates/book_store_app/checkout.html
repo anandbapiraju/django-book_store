@@ -19,7 +19,7 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Continue Shopping</button>
             </form>
-            <form action="{% url 'book_store_app:orders' user.id %}" method="post" class="d-inline">
+            <form action="{% url 'book_store_app:orders' %}" method="post" class="d-inline">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-secondary">View Orders</button>
             </form>

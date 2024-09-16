@@ -1,23 +1,26 @@
 from datetime import datetime
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import translation
 from django.views.generic import ListView, FormView, UpdateView
 from .forms import LoginForm, ProfileForm, BookForm, RegisterForm
 from .models import Book, Cart, BookSpecifications, Profile, Orders, OrderItems
-from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.views import View
 
 
-
-class BookListView(ListView):
+class BookListView(LoginRequiredMixin,ListView):
     model = Book
     template_name = "book_store_app/home.html"
     context_object_name = 'books'
 
 
-class CartView(ListView):
+class CartView(LoginRequiredMixin,ListView):
     model = Cart
     template_name = "book_store_app/cart.html"
     context_object_name = 'cart_items'
@@ -48,7 +51,8 @@ class CustomLoginView(View):
                 auth_login(request, user)
                 return redirect('book_store_app:home')
             else:
-                return render(request, 'book_store_app/login.html', {'form': form, 'message': 'Invalid login credentials'})
+                return render(request, 'book_store_app/login.html',
+                              {'form': form, 'message': 'Invalid login credentials'})
         return render(request, 'book_store_app/login.html', {'form': form})
 
 
@@ -71,7 +75,7 @@ class RegisterView(FormView):
         return super().form_valid(form)
 
 
-class MyProfileView(UpdateView):
+class MyProfileView(LoginRequiredMixin,UpdateView):
     model = Profile
     form_class = ProfileForm
     template_name = 'book_store_app/my_profile.html'
@@ -86,6 +90,7 @@ class MyProfileView(UpdateView):
         return kwargs
 
 
+@login_required()
 def add_to_cart_view(request):
     if request.method == 'POST':
         units = int(request.POST.get('quantity', 1))
@@ -113,6 +118,7 @@ def add_to_cart_view(request):
     return redirect('book_store_app:home')
 
 
+@login_required
 def update_cart_view(request):
     context = {'cart_items': Cart.objects.filter(user=request.user)}
     if request.method == 'POST':
@@ -134,6 +140,7 @@ def update_cart_view(request):
     return render(request, 'book_store_app/cart.html', context)
 
 
+@login_required
 def book_details_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book_specs = get_object_or_404(BookSpecifications, book=book)
@@ -141,12 +148,14 @@ def book_details_view(request, book_id):
     return render(request, 'book_store_app/book_details.html', context)
 
 
+@login_required
 def delete_item_view(request, item_id):
     cart = get_object_or_404(Cart, id=item_id, user=request.user)
     cart.delete()
-    return redirect('book_store_app:cart',user_id=request.user.id)
+    return redirect('book_store_app:cart', user_id=request.user.id)
 
 
+@login_required
 def search_view(request):
     search_text = ''
     if request.method == 'POST':
@@ -166,6 +175,7 @@ def search_view(request):
     return render(request, 'book_store_app/search_results.html', context)
 
 
+@login_required
 def shopping_view(request):
     profile = Profile.objects.get(user=request.user)
     context = {'profile': profile}
@@ -177,9 +187,8 @@ def shopping_view(request):
     return render(request, 'book_store_app/shopping.html', context)
 
 
+@login_required
 def checkout_view(request):
-    context = {}
-
     if request.method == 'POST':
         total_bill = request.POST.get('total_bill', '0.0')
         phone_number = request.POST.get('phone_number', '').strip()
@@ -187,7 +196,7 @@ def checkout_view(request):
         pincode = request.POST.get('pincode', '0').strip()
 
         if not (phone_number and address and pincode):
-            context['error'] = "All fields are required."
+            context = {'error': "All fields are required."}
         else:
             order = Orders.objects.create(
                 user=request.user,
@@ -204,11 +213,13 @@ def checkout_view(request):
                     user=item.user,
                     order=order,
                     book=item.book,
-                    quantity=item.quantity
+                    quantity=item.quantity,
                 )
                 order_items.append(order_item)
 
             cart_items.delete()
+
+            request.session['total_bill'] = total_bill
 
             context = {
                 'total_bill': total_bill,
@@ -222,27 +233,34 @@ def checkout_view(request):
     return render(request, 'book_store_app/checkout.html', context)
 
 
-class OrdersView(ListView):
-    model = OrderItems
-    template_name = "book_store_app/orders.html"
-    context_object_name = 'order_items'
-
-    def get_queryset(self):
-        return OrderItems.objects.filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+@login_required
+def orders_view(request):
+    order_items = OrderItems.objects.filter(user=request.user)
+    total_bill = request.session.get('total_bill', 0)
+    context = {
+        'order_items': order_items,
+        'total_bill': total_bill
+    }
+    return render(request, 'book_store_app/orders.html', context)
 
 
+@login_required
 def set_language(request):
-    language = request.GET.get('language', 'en')
+    language = request.GET.get('language', '')
     translation.activate(language)
     request.session['django_language'] = language
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+def staff_login_required(view_func):
+    @login_required
+    @staff_member_required
+    def _wrapped_view(request, *args, **kwargs):
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
+
+@staff_login_required
 def staff_dashboard(request):
     if not request.user.is_staff:
         return redirect('book_store_app:home')
@@ -251,6 +269,8 @@ def staff_dashboard(request):
     return render(request, 'book_store_app/inventory/staff_dashboard.html', context)
 
 
+
+@staff_login_required
 def update_inventory_view(request):
     books = Book.objects.all().order_by('id')
     if request.method == 'POST':
@@ -264,12 +284,14 @@ def update_inventory_view(request):
             book.save()
         messages.success(request, 'Inventory updated successfully!')
         return redirect('book_store_app:staff_dashboard')
-    context = {
-        'books': books,
-    }
-    return render(request, 'book_store_app/inventory/updateInventory.html', context)
+    paginator = Paginator(books, 10)  # Show 10 books per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'book_store_app/inventory/updateInventory.html', {'page_obj': page_obj})
 
 
+@staff_login_required
 def add_book_view(request):
     if request.method == "POST":
         form = BookForm(request.POST, request.FILES)
@@ -282,43 +304,35 @@ def add_book_view(request):
     return render(request, 'book_store_app/inventory/addBook.html', {'form': form})
 
 
+@staff_login_required
 def delete_book_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book.delete()
     return redirect('book_store_app:staff_dashboard')
 
 
-def book_specifications_view(request,book_id):
+@staff_login_required
+def book_specifications_view(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book_specs = get_object_or_404(BookSpecifications, book=book)
-    if request.method=="POST":
+    if request.method == "POST":
         if 'book_img' in request.FILES:
             book.book_img = request.FILES['book_img']
             book.save()
-        book_specs.book_code=request.POST.get('book_code')
-        book_specs.publisher=request.POST.get('publisher')
+        book_specs.book_code = request.POST.get('book_code')
+        book_specs.publisher = request.POST.get('publisher')
         publish_date_str = request.POST.get('publish_date')
         if publish_date_str:
             book_specs.publish_date = datetime.strptime(publish_date_str, '%Y-%m-%d').date()
-        book_specs.pages=request.POST.get('pages')
-        book_specs.description=request.POST.get('description')
+        book_specs.pages = request.POST.get('pages')
+        book_specs.description = request.POST.get('description')
         book_specs.save()
         return redirect('book_store_app:staff_dashboard')
     context = {'book_specs': book_specs}
     return render(request, 'book_store_app/inventory/book_specifications.html', context)
 
 
-def order_history_view(request):
-    if not request.user.is_staff:
-        messages.error(request, "Please Login with Staff Credentials")
-        return redirect('book_store_app:login')
-    orders=Orders.objects.all().order_by('-id')
-    context = {'orders':orders}
-    return render(request, 'book_store_app/inventory/order_history.html', context)
-
-
-
-
+@staff_login_required
 def update_order_view(request):
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
@@ -335,7 +349,7 @@ def update_order_view(request):
     return redirect('book_store_app:staff_dashboard')
 
 
-
+@staff_login_required
 def notifications_view(request):
     low_stock_books = Book.objects.filter(quantity__lte=25)
     books_count = low_stock_books.count()
@@ -343,4 +357,54 @@ def notifications_view(request):
         'books': low_stock_books,
         'books_count': books_count
     }
-    return render(request,'book_store_app/inventory/notifications.html',context)
+    return render(request, 'book_store_app/inventory/notifications.html', context)
+
+
+@staff_login_required
+def view_inventory(request):
+    books_list = Book.objects.all()
+    paginator = Paginator(books_list, 10)  # Show 10 books per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'book_store_app/inventory/viewInventory.html', {'page_obj': page_obj})
+
+
+@staff_login_required
+def view_orders(request):
+    status_filter = request.GET.get('status', '')
+
+    if status_filter:
+        orders = Orders.objects.filter(shipping_status=status_filter.capitalize())
+    else:
+        orders = Orders.objects.all()
+
+    # Pagination
+    paginator = Paginator(orders, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'status_filter': status_filter,
+    }
+    return render(request, 'book_store_app/inventory/viewOrders.html', context)
+
+
+@staff_login_required
+def order_status_view(request):
+    # Get all orders
+    orders = Orders.objects.all()
+
+    if request.method == 'POST':
+        for order in orders:
+            # Update the shipping status based on the form input
+            status = request.POST.get(f'order_status_{order.id}')
+            order.shipping_status = status
+            order.save()
+
+        return redirect('book_store_app:orderStatus')  # Redirect after updating
+
+    context = {
+        'orders': orders
+    }
+    return render(request, 'book_store_app/inventory/order_status.html', context)

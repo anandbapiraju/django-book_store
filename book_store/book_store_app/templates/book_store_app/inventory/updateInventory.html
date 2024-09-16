@@ -1,82 +1,77 @@
-<style>
-    .title-input{
-      width: 200px;
-    }
-    .wide-input{
-        width:100px;
-    }
-    .price-input{
-          width: 80px;
-    }
-    .stock-input{
-        width: 50px;
-    }
-</style>
 <div class="container">
-    <h3>Update Inventory</h3>
+    <h3>Inventory</h3>
+
+    <!-- Update Books Form -->
     <div class="card">
         <div class="card-header">
-            <h5 class="card-title">Add New Book</h5>
-        </div>
-        <div class="card-body">
-            <a href="{% url 'book_store_app:addBook' %}" class="btn btn-primary">Add Book</a>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title">Existing Books</h5>
+            <h5 class="card-title">Update Existing Books</h5>
         </div>
         <div class="card-body">
             <form method="post" action="{% url 'book_store_app:updateInventory' %}">
-            {% csrf_token %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Genre</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Actions</th>
-                        <th>More Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for book in books %}
-                    <tr>
-                        <td>{{ book.id }}</td>
-                        <td>
-                            <input type="text" name="book_title_{{ book.id }}" value="{{ book.book_title }}" class="form-control title-input" required>
-                        </td>
-                        <td>
-                            <input type="text" name="book_author_{{ book.id }}" value="{{  book.author }}" class="form-control wide-input" required>
-                        </td>
-                        <td>
-                            <input type="text" name="book_genre_{{ book.id }}" value="{{  book.genre }}" class="form-control wide-input" required>
-                        </td>
-                        <td>
-                            <input type="text" name="book_price_{{ book.id }}" value="${{book.price }}" class="form-control price-input" required>
-                        </td>
-                        <td>
-                            <input type="text" name="book_quantity_{{ book.id }}" value="{{ book.quantity }}" class="form-control stock-input" required>
-                        </td>
-                        <td>
-
-                            <!-- Delete Book Button -->
-                            <a href="{% url 'book_store_app:deleteBook' book.id %}" class="btn btn-danger btn-sm">Delete</a>
-                        </td>
-                        <td>
-                            <a href="{% url 'book_store_app:book_specifications' book.id %}" class="btn btn-primary btn-sm">View</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                {% csrf_token %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Genre</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                            <th>More Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in page_obj %}
+                        <tr>
+                            <td>{{ book.id }}</td>
+                            <td>
+                                <input type="text" name="book_title_{{ book.id }}" value="{{ book.book_title }}" class="form-control title-input" required>
+                            </td>
+                            <td>
+                                <input type="text" name="book_author_{{ book.id }}" value="{{ book.author }}" class="form-control wide-input" required>
+                            </td>
+                            <td>
+                                <input type="text" name="book_genre_{{ book.id }}" value="{{ book.genre }}" class="form-control wide-input" required>
+                            </td>
+                            <td>
+                                <input type="text" name="book_price_{{ book.id }}" value="{{ book.price }}" class="form-control price-input" required>
+                            </td>
+                            <td>
+                                <input type="text" name="book_quantity_{{ book.id }}" value="{{ book.quantity }}" class="form-control stock-input" required>
+                            </td>
+                            <td>
+                                <a href="{% url 'book_store_app:deleteBook' book.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'book_store_app:book_specifications' book.id %}" class="btn btn-primary btn-sm">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
                 <button type="submit" class="btn btn-primary">Update All</button>
             </form>
         </div>
     </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
 </div>
-
-
